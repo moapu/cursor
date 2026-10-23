@@ -84,9 +84,9 @@ def ani(frames, hot, view, sizes):
 def windows(c, sizes, out):
     """Write cursor `c` as <win>.cur or <win>.ani; returns the file name."""
     if len(c.frames) == 1:
-        name, data = f"{c.win}.cur", cur(c.frames[0][0], c.hot, c.win_view, sizes)
+        name, data = f"{c.win}.cur", cur(c.frames[0][0], c.hot, c.grid, sizes)
     else:
-        name, data = f"{c.win}.ani", ani(c.frames, c.hot, c.win_view, sizes)
+        name, data = f"{c.win}.ani", ani(c.frames, c.hot, c.grid, sizes)
     (out / name).write_bytes(data)
     return name
 
