@@ -1,0 +1,56 @@
+[Version]
+signature="$CHICAGO$"
+
+[DefaultInstall]
+CopyFiles = Scheme.Cur
+AddReg    = Scheme.Reg, Wreg
+
+[DestinationDirs]
+Scheme.Cur = 10,"%CUR_DIR%"
+
+[Scheme.Reg]
+HKCU,"Control Panel\Cursors\Schemes","%SCHEME_NAME%",0x00020000,"%10%\%CUR_DIR%\pointer.ani,%10%\%CUR_DIR%\help.cur,%10%\%CUR_DIR%\working.ani,%10%\%CUR_DIR%\busy.ani,%10%\%CUR_DIR%\precision.cur,%10%\%CUR_DIR%\text.cur,%10%\%CUR_DIR%\handwriting.cur,%10%\%CUR_DIR%\unavailable.ani,%10%\%CUR_DIR%\vert.cur,%10%\%CUR_DIR%\horz.cur,%10%\%CUR_DIR%\dgn1.cur,%10%\%CUR_DIR%\dgn2.cur,%10%\%CUR_DIR%\move.cur,%10%\%CUR_DIR%\alternate.cur,%10%\%CUR_DIR%\link.cur,%10%\%CUR_DIR%\pin.ani,%10%\%CUR_DIR%\person.cur"
+
+[Wreg]
+HKCU,"Control Panel\Cursors",,0x00020000,"%SCHEME_NAME%"
+HKCU,"Control Panel\Cursors",Arrow,0x00020000,"%10%\%CUR_DIR%\pointer.ani"
+HKCU,"Control Panel\Cursors",Help,0x00020000,"%10%\%CUR_DIR%\help.cur"
+HKCU,"Control Panel\Cursors",AppStarting,0x00020000,"%10%\%CUR_DIR%\working.ani"
+HKCU,"Control Panel\Cursors",Wait,0x00020000,"%10%\%CUR_DIR%\busy.ani"
+HKCU,"Control Panel\Cursors",Crosshair,0x00020000,"%10%\%CUR_DIR%\precision.cur"
+HKCU,"Control Panel\Cursors",IBeam,0x00020000,"%10%\%CUR_DIR%\text.cur"
+HKCU,"Control Panel\Cursors",NWPen,0x00020000,"%10%\%CUR_DIR%\handwriting.cur"
+HKCU,"Control Panel\Cursors",No,0x00020000,"%10%\%CUR_DIR%\unavailable.ani"
+HKCU,"Control Panel\Cursors",SizeNS,0x00020000,"%10%\%CUR_DIR%\vert.cur"
+HKCU,"Control Panel\Cursors",SizeWE,0x00020000,"%10%\%CUR_DIR%\horz.cur"
+HKCU,"Control Panel\Cursors",SizeNWSE,0x00020000,"%10%\%CUR_DIR%\dgn1.cur"
+HKCU,"Control Panel\Cursors",SizeNESW,0x00020000,"%10%\%CUR_DIR%\dgn2.cur"
+HKCU,"Control Panel\Cursors",SizeAll,0x00020000,"%10%\%CUR_DIR%\move.cur"
+HKCU,"Control Panel\Cursors",UpArrow,0x00020000,"%10%\%CUR_DIR%\alternate.cur"
+HKCU,"Control Panel\Cursors",Hand,0x00020000,"%10%\%CUR_DIR%\link.cur"
+HKCU,"Control Panel\Cursors",Pin,0x00020000,"%10%\%CUR_DIR%\pin.ani"
+HKCU,"Control Panel\Cursors",Person,0x00020000,"%10%\%CUR_DIR%\person.cur"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Runonce\Setup\","",,"rundll32.exe shell32.dll,Control_RunDLL main.cpl @0"
+
+[Scheme.Cur]
+pointer.ani
+help.cur
+working.ani
+busy.ani
+precision.cur
+text.cur
+handwriting.cur
+unavailable.ani
+vert.cur
+horz.cur
+dgn1.cur
+dgn2.cur
+move.cur
+alternate.cur
+link.cur
+pin.ani
+person.cur
+
+[Strings]
+CUR_DIR     = "Cursors\AttackOnTitan"
+SCHEME_NAME = "Attack on Titan"

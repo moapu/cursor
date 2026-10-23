@@ -44,6 +44,12 @@ DEFS = (
     + _grad("straw", "#f6d98a", "#e2b55a")
     + _grad("vest", "#e5323f", "#b81f2e")
     + _grad("meat", "#d9764a", "#8f3b20", x2=1)
+    + _grad("cloak", "#3f8a5e", "#21523a")
+    + _grad("jacket", "#e2c08e", "#b38552")
+    + _grad("spear", "#8a95a5", "#4a525e", x2=1, y2=0)
+    + _grad("wing", "#5a8fdc", "#1f4690")
+    + _grad("muscle", "#e0564a", "#9c2a20")
+    + _grad("parchment", "#f6ecd2", "#e0cfa4")
 )
 
 RAW = re.compile(r"<!--raw-->(.*?)<!--/raw-->", re.S)
