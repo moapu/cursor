@@ -52,5 +52,5 @@ pin.ani
 person.cur
 
 [Strings]
-CUR_DIR     = "Cursors\Luffy"
-SCHEME_NAME = "Luffy"
+CUR_DIR     = "Cursors\OnePiece"
+SCHEME_NAME = "One Piece"
