@@ -11,8 +11,8 @@ from pathlib import Path
 
 from PIL import Image
 
-from art import (ARROW_OUT, DOUBLE, PLUS, POINT_TIP, QMARK, aura_ring, badge, bone, brush, closed_hand, compass, crossed,
-                 forbidden, hat, log_pose, luffy_pointing, meat, menu_card, open_hand, orbit, porthole, reach, scope, steel,
+from art import (ARROW_OUT, PLUS, POINT_TIP, QMARK, aura_ring, badge, bone, brush, closed_hand, compass, crocodile_hook,
+                 crossed, forbidden, hat, log_pose, luffy_pointing, meat, menu_card, open_hand, orbit, porthole, reach, scope,
                  yoru, yoru_working)
 from formats import inf, render, windows, xcursor
 from svg import pulse, rot
@@ -55,8 +55,11 @@ GRAB = [(open_hand(1 + .03 * pulse(i)), 120) for i in range(12)]
 GRABBING = [(closed_hand(1 - .04 * pulse(i)), 120) for i in range(12)]
 
 
-def resize(deg):
-    return still(rot(steel(DOUBLE), deg))
+def resize(deg, flip_y=False):
+    body = rot(crocodile_hook(), deg)
+    if flip_y:
+        body = f'<g transform="translate(0 64) scale(1 -1)">{body}</g>'
+    return still(body)
 
 
 # cursors --------------------------------------------------------------------------------------------------------------
@@ -116,6 +119,13 @@ CURSORS = [
     Cursor("person", still(hat(32, 40, 1.2)), (32, 32), None, "person"),
 ]
 
+# Extra Windows assets: wrist outside the dragged edge, hook facing into the window.
+RESIZE_ANGLES = {"n": -90, "ne": -45, "e": 0, "se": 45, "s": 90, "sw": 135, "w": 180, "nw": -135}
+DIRECTIONAL_RESIZE = [
+    Cursor(f"resize-{direction}", resize(deg, flip_y=direction == "e"), (32, 32), None, f"resize-{direction}")
+    for direction, deg in RESIZE_ANGLES.items()
+]
+
 # Windows registry role -> file stem, in Control Panel scheme order
 ROLES = {
     "Arrow": "pointer", "Help": "help", "AppStarting": "working", "Wait": "busy", "Crosshair": "precision", "IBeam": "text",
@@ -154,7 +164,7 @@ def main():
     for f in ("index.theme", "cursor.theme"):
         (X_DIR / f).write_text(f"[Icon Theme]\nName={NAME}\nComment={TITLE} cursors\n")
     with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor() as pool:
-        files = dict(filter(None, pool.map(lambda c: build(c, Path(tmp)), CURSORS)))
+        files = dict(filter(None, pool.map(lambda c: build(c, Path(tmp)), CURSORS + DIRECTIONAL_RESIZE)))
     inf(ROLES, {role: files[stem] for role, stem in ROLES.items()}, WIN_DIR, NAME, TITLE)
     preview()
 

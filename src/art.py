@@ -3,7 +3,7 @@
 import math
 import random
 
-from svg import (BAND, BONE, HAT, NAVY, OUT, RED, SKIN, SKIN_LIT, SKIN_SH, STEEL, WHITE, bolt, cel, clipped, multi,
+from svg import (BAND, BONE, HAT, NAVY, OUT, RED, SKIN, SKIN_LIT, SKIN_SH, WHITE, bolt, cel, clipped, multi,
                  outlined, place, pulse, puffs, raw, ring, rot, tf_point, tfs)
 
 # small pieces ---------------------------------------------------------------------------------------------------------
@@ -212,16 +212,18 @@ def forbidden(deg, flash=0.0):
     )
 
 
-DOUBLE = "M4 32L17 19V27H47V19L60 32L47 45V37H17V45Z"
-
-
-def steel(d):
-    """Black gloss shape with a steel rim (the resize arrows)."""
-    return (
-        f'<path d="{d}" fill="none" stroke-width="5"/>'
-        + f'<path d="{d}" fill="url(#gloss)" stroke="{STEEL}" stroke-width="1.6"/>'
-        + clipped(d, f'<path d="M10 10V40" stroke="{WHITE}" stroke-width="2.4" opacity=".35"/>')
+def crocodile_hook():
+    """Crocodile's gold hook and ribbed cuff, with the shaft along the horizontal resize axis."""
+    hook = "M27 47V26C27 14 33 7 43 8C56 9 58 25 49 32C45 35 40 33 37 29L46 26C50 23 48 17 43 17C36 16 36 23 36 29V47Z"
+    shine = "M30 40V26Q30 11 42 11Q50 11 52 19"
+    body = (
+        f'<path d="{hook}" fill="url(#gold)" stroke-width="2.6"/>'
+        + clipped(hook, f'<path d="{shine}" fill="none" stroke="#fff4c5" stroke-width="2.2"/>')
+        + '<rect x="20" y="44" width="23" height="14" rx="3" fill="url(#gold)" stroke-width="2.6"/>'
+        + '<path d="M24 47V55M29 47V55M34 47V55M39 47V55" stroke="#a86c16" stroke-width="1.4"/>'
+        + '<path d="M22 46H41M22 56H41" stroke="#fff0b5" stroke-width="1.5"/>'
     )
+    return rot(body, -90)
 
 
 # swords ---------------------------------------------------------------------------------------------------------------
