@@ -1,4 +1,4 @@
-"""SVG plumbing: palette, shared <defs>, the sticker wrapper and small shape helpers."""
+"""SVG plumbing: palette, shared <defs>, the shadow wrapper and small shape helpers."""
 
 import itertools
 import math
@@ -25,10 +25,6 @@ def _grad(id_, *stops, x2=0, y2=1):
 DEFS = (
     '<filter id="sh" x="-20%" y="-20%" width="140%" height="140%">'
     '<feDropShadow dx="1" dy="1.5" stdDeviation="1.2" flood-opacity=".45"/></filter>'
-    '<filter id="stk" x="-20%" y="-20%" width="140%" height="140%">'
-    '<feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="d"/><feFlood flood-color="#fff"/>'
-    '<feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge>'
-    "</filter>"
     '<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>'
     '<radialGradient id="glass" cx=".35" cy=".35" r=".8"><stop stop-color="#ffffff"/>'
     '<stop offset="1" stop-color="#7cc8f5"/></radialGradient>'
@@ -50,18 +46,18 @@ RAW = re.compile(r"<!--raw-->(.*?)<!--/raw-->", re.S)
 
 
 def raw(markup):
-    """Draw `markup` underneath, without the sticker edge or shadow (glows). Only at the top level of a body."""
+    """Draw `markup` underneath, without the shadow (glows). Only at the top level of a body."""
     return f"<!--raw-->{markup}<!--/raw-->"
 
 
 def svg(body, view, zoom=1):
-    """Full document: raw glows underneath, then the body with a drop shadow and a white sticker edge."""
+    """Full document: raw glows underneath, then the dark-outlined body with a drop shadow."""
     k = f'<g transform="scale({zoom})">'
     under = "".join(RAW.findall(body))
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {view * zoom:g} {view * zoom:g}"><defs>{DEFS}</defs>{k}{under}</g>'
         f'<g filter="url(#sh)" stroke="{OUT}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">'
-        f"<g filter=\"url(#stk)\">{k}{RAW.sub('', body)}</g></g></g></svg>"
+        f"{k}{RAW.sub('', body)}</g></g></svg>"
     )
 
 
@@ -119,7 +115,7 @@ def puffs(circles, fill=WHITE):
 
 
 def multi(items, tf=(0, 0, 0, 1), extra=""):
-    """[(element, fill)] drawn as one sticker: one outline pass for all, then each fill."""
+    """[(element, fill)] drawn as one silhouette: one outline pass for all, then each fill."""
     outline = "".join(e for e, _ in items)
     fills = "".join(f'<g fill="{f}" stroke="none">{e}</g>' for e, f in items)
     return f'<g transform="{tfs(tf)}"><g fill="none" stroke="{OUT}" stroke-width="{6 / tf[3]:.2f}">{outline}</g>{fills}{extra}</g>'
