@@ -1079,10 +1079,10 @@ FLOAT = [0, -0.8, -1.6, -2, -1.6, -0.8]
 SWING = [(log_pose(n), 70) for n in (-35, 20, -14, 8, -4, 0)] + [(log_pose(0), HOLD)]
 
 
-def badge(glyph, body=None):
-    x, y = BADGE_AT
+def badge(glyph, body=None, k=1.0, at=None):
+    x, y = at or BADGE_AT
     return (body or PTR) + (
-        f'<g transform="translate({x} {y})"><circle r="10.5" fill="{NAVY}"/>'
+        f'<g transform="translate({x} {y}) scale({k})"><circle r="10.5" fill="{NAVY}"/>'
         f'<path d="{glyph}" fill="none" stroke="{WHITE}" stroke-width="3"/></g>'
     )
 
@@ -1097,7 +1097,7 @@ def menu_card():
 
 
 HELPS = {
-    "badge": still(badge(QMARK)),
+    "badge": still(badge(QMARK, k=1.45, at=(19, 44))),  # big ? so help reads at a glance
     "poneglyph": [(poneglyph(0.25 + 0.25 * math.sin(math.radians(a))), 110) for a in range(0, 360, 30)],
     "chopper": WONDER,
 }
