@@ -8,6 +8,7 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from PIL import Image
 
@@ -156,6 +157,17 @@ def preview():
     sheet.save(Path(__file__).with_name("preview.png"))
 
 
+def package_windows():
+    """Include the complete installer and its single maintained helper source."""
+    source = ROOT / "src" / "windows"
+    with ZipFile(ROOT / f"{NAME}-Windows.zip", "w", ZIP_DEFLATED) as archive:
+        for path in sorted(WIN_DIR.iterdir()):
+            if path.is_file() and path.suffix in (".cur", ".ani"):
+                archive.write(path, path.relative_to(ROOT))
+        for name in ("install.ps1", "uninstall.ps1", "common.ps1", "DirectionalResize.cs"):
+            archive.write(source / name, f"{NAME}-Windows/{name}")
+
+
 def main():
     for d in (X_DIR, WIN_DIR):
         shutil.rmtree(d, ignore_errors=True)
@@ -166,6 +178,7 @@ def main():
     with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor() as pool:
         files = dict(filter(None, pool.map(lambda c: build(c, Path(tmp)), CURSORS + DIRECTIONAL_RESIZE)))
     inf(ROLES, {role: files[stem] for role, stem in ROLES.items()}, WIN_DIR, NAME, TITLE)
+    package_windows()
     preview()
 
 

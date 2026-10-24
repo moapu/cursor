@@ -204,7 +204,7 @@ internal sealed class ResizeContext : ApplicationContext
     private readonly SettingsWatch settingsWatch = new SettingsWatch();
     private readonly NotifyIcon tray = new NotifyIcon();
     private readonly ToolStripMenuItem pause = new ToolStripMenuItem("Pause");
-    private bool enabled = true, held;
+    private bool enabled, held, paused;
     private Edge hovered = Edge.None, dragging = Edge.None;
     private readonly string directory;
     private static readonly string[] SettingNames = { "SizeNWSE", "SizeNESW", "SizeWE", "SizeNS" };
@@ -214,18 +214,18 @@ internal sealed class ResizeContext : ApplicationContext
         this.directory = directory;
         try
         {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Cursors"))
-                foreach (string name in SettingNames) settings[name] = Convert.ToString(key.GetValue(name));
+            CaptureSettings();
             LoadCursors();
             var menu = new ContextMenuStrip();
             pause.Click += delegate { Toggle(); };
             menu.Items.Add(pause);
-            menu.Items.Add("Restore current scheme", null, delegate { RestoreScheme(); });
+            menu.Items.Add("Restore current scheme", null, delegate { paused = true; RestoreScheme(); });
             menu.Items.Add("Exit — restore cursors", null, delegate { ExitThread(); });
             tray.Icon = SystemIcons.Application;
             tray.Text = "One Piece: eight-direction resize";
             tray.ContextMenuStrip = menu;
             tray.Visible = true;
+            SetEnabled(SameScheme()); // Login startup must not replace another theme's resize cursors.
             timer.Interval = 100;
             timer.Tick += delegate { Tick(); };
             timer.Start();
@@ -249,12 +249,22 @@ internal sealed class ResizeContext : ApplicationContext
         originals.Clear();
         hooks.Clear();
     }
+    private void CaptureSettings()
+    {
+        using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Cursors"))
+            foreach (string name in SettingNames) settings[name] = Convert.ToString(key.GetValue(name));
+    }
     private bool SameScheme()
     {
         using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Cursors"))
             foreach (string name in SettingNames)
-                if (!String.Equals(settings[name], Convert.ToString(key.GetValue(name)), StringComparison.OrdinalIgnoreCase))
+            {
+                string path = Convert.ToString(key.GetValue(name));
+                if (!String.Equals(settings[name], path, StringComparison.OrdinalIgnoreCase) ||
+                    String.IsNullOrEmpty(path) ||
+                    !String.Equals(Path.GetFileName(Path.GetDirectoryName(path)), "OnePiece", StringComparison.OrdinalIgnoreCase))
                     return false;
+            }
         return true;
     }
     private void SetEnabled(bool value)
@@ -272,6 +282,7 @@ internal sealed class ResizeContext : ApplicationContext
         Native.Reload();
         ClearState();
         FreeCursors();
+        CaptureSettings();
         LoadCursors();
     }
     private void RestoreScheme()
@@ -288,8 +299,9 @@ internal sealed class ResizeContext : ApplicationContext
     }
     private void Toggle()
     {
-        if (enabled) { Restore(); SetEnabled(false); return; }
+        if (enabled) { Restore(); paused = true; SetEnabled(false); return; }
         if (!SameScheme()) { MessageBox.Show("Select your One Piece cursor scheme before resuming."); return; }
+        paused = false;
         ResetCursors();
         SetEnabled(true);
     }
@@ -329,13 +341,14 @@ internal sealed class ResizeContext : ApplicationContext
             if (settingsWatch.Poll())
             {
                 ResetCursors(); // Registry edits only, never our own cursor swaps.
-                if (!SameScheme()) SetEnabled(false);
+                SetEnabled(!paused && SameScheme());
             }
             if (!enabled) { timer.Interval = 150; return; }
             UpdateCursor();
         }
         catch (Exception error)
         {
+            paused = true;
             SetEnabled(false);
             Native.SystemParametersInfoW(0x0057, 0, IntPtr.Zero, 0);
             ClearState();
