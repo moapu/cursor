@@ -24,7 +24,7 @@ ln -s "$PWD/OnePiece" ~/.icons/OnePiece
 ```
 
 Then set the theme to `OnePiece`, e.g. `XCURSOR_THEME=OnePiece` / `hyprctl setcursor OnePiece 24`.
-On Linux the pointer, text and grab cursors are drawn 1.5x and the link cursor 2x the nominal size.
+On Linux the pointer, text, resize and grab cursors are drawn 1.5x and the link cursor 2x the nominal size.
 
 ## Windows
 

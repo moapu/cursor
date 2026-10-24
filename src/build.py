@@ -41,7 +41,7 @@ def still(body):
 
 # frames ---------------------------------------------------------------------------------------------------------------
 
-ZOOM = 1.5  # Linux: pointer family, text and grab drawn bigger than the rest; the link hand is 2x
+ZOOM = 1.5  # Linux: pointer family, text, resize and grab drawn bigger than the rest; the link hand is 2x
 PTR_HOT, BADGE_AT = (5, 4), (16, 47)
 POINTER = [(yoru(), 2400)] + [(yoru(glint=g), 35) for g in range(36, -6, -6)]  # a shine runs down the blade
 PTR = POINTER[0][0]
@@ -80,16 +80,16 @@ CURSORS = [
            "not-allowed forbidden circle no-drop dnd_no_drop 03b6e0fcb3499374a867c041f52298f0", "unavailable"),
     Cursor("sb_v_double_arrow", resize(90), (32, 32),
            "ns-resize row-resize double_arrow v_double_arrow size-ver size_ver split_v n-resize s-resize top_side "
-           "bottom_side top_tee bottom_tee 00008160000006810000408080010102 2870a09082c103050810ffdffffe0204", "vert"),
+           "bottom_side top_tee bottom_tee 00008160000006810000408080010102 2870a09082c103050810ffdffffe0204", "vert", zoom=ZOOM),
     Cursor("sb_h_double_arrow", resize(0), (32, 32),
            "ew-resize col-resize h_double_arrow size-hor size_hor split_h e-resize w-resize left_side right_side "
-           "left_tee right_tee 028006030e0e7ebffc7f7070c0600140 14fef782d02440884392942c1120523", "horz"),
+           "left_tee right_tee 028006030e0e7ebffc7f7070c0600140 14fef782d02440884392942c1120523", "horz", zoom=ZOOM),
     Cursor("bd_double_arrow", resize(45), (32, 32),
            "nwse-resize size_fdiag nw-resize se-resize top_left_corner bottom_right_corner ul_angle lr_angle "
-           "c7088f0f3e6c8088236ef8e1e3e70000", "dgn1"),
+           "c7088f0f3e6c8088236ef8e1e3e70000", "dgn1", zoom=ZOOM),
     Cursor("fd_double_arrow", resize(-45), (32, 32),
            "nesw-resize size_bdiag ne-resize sw-resize top_right_corner bottom_left_corner ur_angle ll_angle "
-           "fcf1c3c7cd4491d801f1e1c78f100000", "dgn2"),
+           "fcf1c3c7cd4491d801f1e1c78f100000", "dgn2", zoom=ZOOM),
     Cursor("fleur", still(compass()), (32, 32),
            "move all-scroll size_all 4498f0e0c1937ffe01fd06f973665830 9081237383d90e509aa00f00170e968f", "move"),
     Cursor("sb_up_arrow", still(reach(0)), (32, 5), "up-arrow center_ptr", "alternate"),
