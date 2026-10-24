@@ -8,7 +8,6 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile
 
 from PIL import Image
 
@@ -33,7 +32,6 @@ class Cursor:
     aliases: str | None = ""  # None: Windows only
     win: str | None = None  # Windows file stem
     grid: int = 64  # canvas size the body is drawn on
-    win_view: int = 64  # Windows viewBox
     zoom: float = 1  # Linux only: drawn this much bigger (Windows cursors are a fixed size)
 
 
@@ -72,7 +70,7 @@ CURSORS = [
     Cursor("left_ptr_watch", WORKING, PTR_HOT,
            "progress 00000000000000020006000e7e9ffc3f 08e8e1c95fe2fc01f976f1e063a24ccd 3ecb610c1bf2410f44200f48c40d3599",
            "working", zoom=ZOOM),
-    Cursor("wait", BUSY, (48, 48), "watch", "busy", grid=96, win_view=96),
+    Cursor("wait", BUSY, (48, 48), "watch", "busy", grid=96),
     Cursor("crosshair", still(scope()), (32, 32),
            "cross cross_reverse diamond_cross tcross color-picker dotbox dot_box_mask draped_box icon target", "precision"),
     Cursor("xterm", TEXT, (32, 32), "ibeam text", "text", zoom=ZOOM),
@@ -147,17 +145,6 @@ def preview():
     sheet.save(Path(__file__).with_name("preview.png"))
 
 
-def package_windows():
-    """Package native cursors, the INF installer and optional PowerShell tools."""
-    source = ROOT / "src" / "windows"
-    with ZipFile(ROOT / f"{NAME}-Windows.zip", "w", ZIP_DEFLATED) as archive:
-        for path in sorted(WIN_DIR.iterdir()):
-            if path.is_file() and path.suffix in (".cur", ".ani", ".inf"):
-                archive.write(path, path.relative_to(ROOT))
-        for name in ("install.ps1", "uninstall.ps1", "common.ps1"):
-            archive.write(source / name, f"{NAME}-Windows/{name}")
-
-
 def main():
     for d in (X_DIR, WIN_DIR):
         shutil.rmtree(d, ignore_errors=True)
@@ -168,7 +155,6 @@ def main():
     with tempfile.TemporaryDirectory() as tmp, ThreadPoolExecutor() as pool:
         files = dict(filter(None, pool.map(lambda c: build(c, Path(tmp)), CURSORS)))
     inf(ROLES, {role: files[stem] for role, stem in ROLES.items()}, WIN_DIR, NAME, TITLE)
-    package_windows()
     preview()
 
 

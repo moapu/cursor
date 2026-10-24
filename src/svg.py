@@ -6,7 +6,7 @@ import re
 
 OUT, WHITE = "#16171d", "#ffffff"
 HAT, BAND, BONE = "#f5c443", "#d7263d", "#fbf6ea"
-SKIN, NAVY, RED, STEEL = "#f8c99c", "#1f3a68", "#ff4d5e", "#b8c2d4"
+SKIN, NAVY, RED = "#f8c99c", "#1f3a68", "#ff4d5e"
 SKIN_LIT, SKIN_SH = "#ffe3c4", "#eaa576"
 
 _ids = itertools.count()
@@ -33,7 +33,6 @@ DEFS = (
     + _grad("gold", "#ffe28f", "#e5a21c")
     + _grad("skin", "#ffe0bf", "#eeae78", x2=1)
     + _grad("steel", "#ffffff", "#d5dbe6", "#8d97aa")
-    + _grad("gloss", "#4a4656", (".45", "#16141c"), ("1", "#050407"))
     + _grad("blackgl", "#4a4d58", (".5", "#1b1c22"))
     + _grad("hakiblade", "#3a3542", (".5", "#121016"))
     + _grad("bronze", "#d9a066", "#8a5a2b")

@@ -30,7 +30,6 @@ HKCU,"Control Panel\Cursors",UpArrow,0x00020000,"%10%\%CUR_DIR%\alternate.cur"
 HKCU,"Control Panel\Cursors",Hand,0x00020000,"%10%\%CUR_DIR%\link.cur"
 HKCU,"Control Panel\Cursors",Pin,0x00020000,"%10%\%CUR_DIR%\pin.ani"
 HKCU,"Control Panel\Cursors",Person,0x00020000,"%10%\%CUR_DIR%\person.cur"
-HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Runonce\Setup\","",,"rundll32.exe shell32.dll,Control_RunDLL main.cpl @0"
 
 [Scheme.Cur]
 pointer.ani

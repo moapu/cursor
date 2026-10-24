@@ -28,36 +28,18 @@ On Linux the pointer, text and grab cursors are drawn 1.5x and the link cursor 2
 
 ## Windows
 
-No background helper, login startup, GlazeWM or Zebar required. All cursors use native Windows `.cur` / `.ani` files.
+Windows uses native `.cur` / `.ani` files. No background process, PowerShell scripts or ZIP required.
 
-### Right-click install
+1. In your checkout, open **`OnePiece-Windows`**, right-click **`install.inf`** → **Install**
+   (under **Show more options** if needed).
+2. Approve the administrator prompt.
+3. Open **Mouse Properties → Pointers**, select **One Piece**, and click **Apply**.
 
-1. Download and extract **`OnePiece-Windows.zip`** completely.
-2. Open `OnePiece-Windows`, right-click **`install.inf`** → **Install** (under **Show more options** if needed).
-3. Approve the administrator prompt. If the cursors do not change immediately, open **Mouse Properties → Pointers**,
-   select **One Piece**, and click **Apply**.
+Files install into `%WINDIR%\Cursors\OnePiece`. To update, install the INF again. To switch away, select another
+cursor scheme in Mouse Properties; the installer does not back up your previous selection.
 
-This installs into `%WINDIR%\Cursors\OnePiece`. To switch away, select another cursor scheme in Mouse Properties.
-The INF installer does not back up your previous selection and is not managed by the PowerShell uninstaller.
-
-### Existing helper installations
-
-Before switching an older helper-based installation to the INF installer, run the updated **`install.ps1`** once
-(**Run with PowerShell**), or `src/windows/install.ps1` in a Git checkout. It stops the old helper and removes its
-matching login startup entry. Installing an INF alone does not stop an already-running helper.
-
-### Optional administrator-free installer
-
-Windows PowerShell 5.1 users can instead right-click **`install.ps1`** → **Run with PowerShell**. It installs into
-`%LOCALAPPDATA%\Cursors\OnePiece`, registers and activates the scheme, then exits. No administrator rights are needed.
-Windows may require a trust confirmation for downloaded scripts; only run a package from a source you trust.
-
-Run **`install.ps1`** again to update this installation. It preserves the original pre-installation backup and keeps
-old helper file records for cleanup by the uninstaller; nothing restarts or runs in the background.
-
-To undo the PowerShell installation, right-click **`uninstall.ps1`** → **Run with PowerShell** and confirm. It is also
-available in `%LOCALAPPDATA%\Cursors\OnePiece`. It restores previous settings and pre-existing files, removes files
-introduced by this installation, and preserves later manual edits. It does not remove an INF installation.
+If you previously installed the directional helper, exit it from its tray menu and disable
+**OnePieceDirectionalResize** in **Windows Settings → Apps → Startup** once. The INF does not stop an old helper.
 
 ### Resize cursors
 
@@ -73,6 +55,5 @@ Needs `xcursorgen`, `rsvg-convert` (librsvg) and Python with Pillow. With Nix:
 nix shell --impure --expr 'with builtins.getFlake "nixpkgs"; with legacyPackages.${builtins.currentSystem}; [ xcursorgen librsvg (python3.withPackages (p: [ p.pillow ])) ]' -c python3 src/build.py
 ```
 
-This rewrites `OnePiece/`, `OnePiece-Windows/` and `src/preview.png`, and creates the self-contained
-`OnePiece-Windows.zip` release package. The ZIP includes `install.inf`, all Windows cursor assets and the optional
-PowerShell installer/uninstaller; users do not need Python or the rest of this repository.
+This regenerates `OnePiece/`, `OnePiece-Windows/` (including `install.inf`) and `src/preview.png`.
+The generated themes are ready to install; Python and the build tools are not needed for installation.

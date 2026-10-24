@@ -84,9 +84,9 @@ def ani(frames, hot, view, sizes):
 def windows(c, sizes, out):
     """Write cursor `c` as <win>.cur or <win>.ani; returns the file name."""
     if len(c.frames) == 1:
-        name, data = f"{c.win}.cur", cur(c.frames[0][0], c.hot, c.win_view, sizes)
+        name, data = f"{c.win}.cur", cur(c.frames[0][0], c.hot, c.grid, sizes)
     else:
-        name, data = f"{c.win}.ani", ani(c.frames, c.hot, c.win_view, sizes)
+        name, data = f"{c.win}.ani", ani(c.frames, c.hot, c.grid, sizes)
     (out / name).write_bytes(data)
     return name
 
@@ -103,8 +103,6 @@ def inf(roles, files, out, folder, title):
         "",
         "[Wreg]", r'HKCU,"Control Panel\Cursors",,0x00020000,"%SCHEME_NAME%"',
         *(rf'HKCU,"Control Panel\Cursors",{r},0x00020000,"{path(r)}"' for r in roles),
-        r'HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Runonce\Setup\","",,'
-        '"rundll32.exe shell32.dll,Control_RunDLL main.cpl @0"',
         "",
         "[Scheme.Cur]", *(files[r] for r in roles), "",
         "[Strings]", rf'CUR_DIR     = "Cursors\{folder}"', f'SCHEME_NAME = "{title}"', "",
