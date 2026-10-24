@@ -3,10 +3,10 @@ $root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $assets = Join-Path $root 'OnePiece-Windows'
 if (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'pointer.ani')) { $assets = $PSScriptRoot }
 $installDir = Join-Path $env:LOCALAPPDATA 'Cursors\OnePiece'
-$target = Join-Path $installDir 'DirectionalResize'
-$exe = Join-Path $target 'DirectionalResize.exe'
+# Only used to retire an older directional-helper installation.
+$legacyDir = Join-Path $installDir 'DirectionalResize'
+$legacyExe = Join-Path $legacyDir 'DirectionalResize.exe'
 $stateFile = Join-Path $installDir 'install-state.json'
-$previousDir = Join-Path $installDir '.previous'
 $cursorKey = 'Control Panel\Cursors'
 $runKey = 'Software\Microsoft\Windows\CurrentVersion\Run'
 $runName = 'OnePieceDirectionalResize'
@@ -18,11 +18,8 @@ $roles = [ordered]@{
 }
 $names = @('') + @($roles.Keys)
 
-function Running-Helper {
-    @(Get-Process -Name DirectionalResize -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exe })
-}
-function Stop-Helper {
-    $running = @(Running-Helper)
+function Stop-LegacyHelper {
+    $running = @(Get-Process -Name DirectionalResize -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $legacyExe })
     if (-not $running.Count) { return }
     $signal = [Threading.EventWaitHandle]::OpenExisting('Local\OnePiece.DirectionalResize.Stop')
     try { $signal.Set() | Out-Null } finally { $signal.Dispose() }
@@ -30,14 +27,14 @@ function Stop-Helper {
         if (-not $process.WaitForExit(5000)) { throw 'Close DirectionalResize from its tray menu before continuing.' }
     }
 }
-function Start-Helper {
-    $process = Start-Process -FilePath $exe -PassThru
-    if ($process.WaitForExit(500)) { throw 'Directional resize helper exited during startup.' }
-    return $process.Id
+function Test-LegacyStartup([string]$Value) {
+    return [Environment]::ExpandEnvironmentVariables($Value).Trim('"') -ieq $legacyExe
 }
-function Invoke-Helper([string]$Path, [string]$Argument) {
-    $process = Start-Process -FilePath $Path -ArgumentList $Argument -Wait -PassThru
-    if ($process.ExitCode -ne 0) { throw "Cursor helper failed: $Argument" }
+function Disable-LegacyStartup {
+    $values = Read-Values $runKey @($runName)
+    if (-not $values.ContainsKey($runName) -or -not (Test-LegacyStartup $values[$runName].data)) { return $false }
+    Restore-Values $runKey @($runName) @{}
+    return $true
 }
 function Read-Values([string]$Path, [string[]]$Names) {
     $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($Path)
@@ -69,11 +66,13 @@ function Unpack-Values($Entries) {
     return $values
 }
 function Undo-Values([string]$Path, $Expected, $Previous) {
-    $expectedValues = Unpack-Values $Expected
     $before = Unpack-Values $Previous
-    $current = Read-Values $Path @($expectedValues.Keys)
-    foreach ($name in $expectedValues.Keys) {
-        if (-not $current.ContainsKey($name) -or $current[$name].data -cne $expectedValues[$name].data) { continue }
+    $current = Read-Values $Path @($Expected | ForEach-Object { $_.name })
+    foreach ($entry in $Expected) {
+        $name = [string]$entry.name
+        if ($entry.missing) {
+            if ($current.ContainsKey($name)) { continue }
+        } elseif (-not $current.ContainsKey($name) -or $current[$name].data -cne $entry.data) { continue }
         Restore-Values $Path @($name) $before
     }
 }
@@ -113,7 +112,7 @@ function Register-Scheme {
     } finally { $current.Dispose() }
 }
 function Reload-Cursors {
-    # Same SPI_SETCURSORS API as the helper; uninstall must work after removing its EXE.
+    # One-shot SPI_SETCURSORS call; no resident process or helper executable.
     if (-not ('OnePieceInstall.Native' -as [type])) {
         Add-Type -TypeDefinition @'
 using System;

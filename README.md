@@ -13,7 +13,7 @@ One Piece cursor theme for Linux (XCursor) and Windows (`.cur` / `.ani`), genera
 | Text | Meat on the bone |
 | Grab / grabbing | Gear 3 giant hand |
 | Not allowed | Jolly Roger shaking "no" |
-| Resize | Crocodile's gold hook, rotated to match the resize axis |
+| Resize | Gunko-inspired charcoal folded ribbons, double-ended and rotated to match the resize axis |
 | Move | Compass |
 | Precision | Sogeking's scope |
 
@@ -28,50 +28,42 @@ On Linux the pointer, text and grab cursors are drawn 1.5x and the link cursor 2
 
 ## Windows
 
-Requires Windows x64, Windows PowerShell 5.1 and .NET Framework 4.x. No administrator rights, GlazeWM or Zebar required.
+No background helper, login startup, GlazeWM or Zebar required. All cursors use native Windows `.cur` / `.ani` files.
+
+### Right-click install
 
 1. Download and extract **`OnePiece-Windows.zip`** completely.
-2. Open `OnePiece-Windows`, right-click **`install.ps1`** → **Run with PowerShell**.
+2. Open `OnePiece-Windows`, right-click **`install.inf`** → **Install** (under **Show more options** if needed).
+3. Approve the administrator prompt. If the cursors do not change immediately, open **Mouse Properties → Pointers**,
+   select **One Piece**, and click **Apply**.
 
-The installer copies all cursor assets into `%LOCALAPPDATA%\Cursors\OnePiece`, registers and activates the **One Piece**
-scheme, compiles/starts the directional resize helper, and enables its startup at Windows login. No file copying,
-Mouse settings changes or follow-up commands are needed. Windows may require a trust confirmation for downloaded
-scripts; only run a package from a source you trust.
+This installs into `%WINDIR%\Cursors\OnePiece`. To switch away, select another cursor scheme in Mouse Properties.
+The INF installer does not back up your previous selection and is not managed by the PowerShell uninstaller.
 
-For a Git checkout, use `src/windows/install.ps1` instead. The generated `install.inf` remains a **static-cursors-only**
-legacy option; it does not install the directional helper.
+### Existing helper installations
 
-### Updates and uninstall
+Before switching an older helper-based installation to the INF installer, run the updated **`install.ps1`** once
+(**Run with PowerShell**), or `src/windows/install.ps1` in a Git checkout. It stops the old helper and removes its
+matching login startup entry. Installing an INF alone does not stop an already-running helper.
 
-To update, extract the newer package and run **`install.ps1`** again. It refreshes every managed cursor/helper file at
-the same paths, gracefully restarts the helper, and retains the original pre-installation backup.
+### Optional administrator-free installer
 
-To undo the installation, right-click **`uninstall.ps1`** → **Run with PowerShell** and confirm. It is also available in
-`%LOCALAPPDATA%\Cursors\OnePiece` if you deleted the downloaded package. Uninstall restores the previous cursor/startup
-settings and pre-existing files, removes files introduced by this installation, and preserves later manual edits.
-It does not remove a separate older installation made through `install.inf`.
+Windows PowerShell 5.1 users can instead right-click **`install.ps1`** → **Run with PowerShell**. It installs into
+`%LOCALAPPDATA%\Cursors\OnePiece`, registers and activates the scheme, then exits. No administrator rights are needed.
+Windows may require a trust confirmation for downloaded scripts; only run a package from a source you trust.
 
-### Eight-direction resize hooks
+Run **`install.ps1`** again to update this installation. It preserves the original pre-installation backup and keeps
+old helper file records for cleanup by the uninstaller; nothing restarts or runs in the background.
 
-Windows normally shares four resize cursors between opposite edges/corners. The included tray helper places the
-wrist outside each dragged edge/corner, with the hook facing into the window. It starts automatically at login,
-pauses when another cursor theme is selected, and resumes when One Piece is selected again.
+To undo the PowerShell installation, right-click **`uninstall.ps1`** → **Run with PowerShell** and confirm. It is also
+available in `%LOCALAPPDATA%\Cursors\OnePiece`. It restores previous settings and pre-existing files, removes files
+introduced by this installation, and preserves later manual edits. It does not remove an INF installation.
 
-The tray menu provides **Pause**, **Resume**, **Restore current scheme**, and **Exit**. Manual pause lasts until you
-resume or restart the helper. Client-area splitters, custom app cursors, and inaccessible/elevated windows retain
-the normal four-angle cursors. The helper locks the chosen orientation while dragging.
+### Resize cursors
 
-Advanced options from the repository root:
-
-```powershell
-# Skip adding login startup; leave an existing startup preference unchanged.
-powershell -NoProfile -File .\src\windows\install.ps1 -NoStartup
-
-# Stop only the runtime helper; keep the installed theme and startup preference.
-powershell -NoProfile -File .\src\windows\install.ps1 -Stop
-```
-
-Startup can also be disabled through Windows Settings → Apps → Startup → **OnePieceDirectionalResize**.
+Four static, double-ended ribbons cover horizontal, vertical and both diagonal resize axes. Opposite edges share a
+cursor, as Windows normally expects. The ribbons use the same charcoal shading, dark outline and soft shadow as
+Yoru, with a pale ribbon edge for contrast. No per-edge cursor switching or helper is needed.
 
 ## Build
 
@@ -82,5 +74,5 @@ nix shell --impure --expr 'with builtins.getFlake "nixpkgs"; with legacyPackages
 ```
 
 This rewrites `OnePiece/`, `OnePiece-Windows/` and `src/preview.png`, and creates the self-contained
-`OnePiece-Windows.zip` release package. The ZIP includes the installer, uninstaller, shared PowerShell functions,
-existing helper source and all Windows cursor assets; users do not need Python or the rest of this repository.
+`OnePiece-Windows.zip` release package. The ZIP includes `install.inf`, all Windows cursor assets and the optional
+PowerShell installer/uninstaller; users do not need Python or the rest of this repository.

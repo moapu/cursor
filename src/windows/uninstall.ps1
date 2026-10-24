@@ -25,13 +25,14 @@ try {
         if ($file.existed -and (-not [IO.Path]::GetFullPath($file.backup).StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase) -or
             -not (Test-Path -LiteralPath $file.backup -PathType Leaf))) { throw "Missing original file backup: $($file.path)" }
     }
-    if (-not $PSCmdlet.ShouldProcess('One Piece cursors, directional helper and login startup', 'Uninstall and restore previous settings')) { return }
+    if (-not $PSCmdlet.ShouldProcess('One Piece cursors and saved installation files', 'Uninstall and restore previous settings')) { return }
 
-    Stop-Helper
+    Stop-LegacyHelper
     # Do not overwrite settings the user changed after installation.
     Undo-Values $cursorKey $state.expected.cursors $state.original.cursors
     Undo-Values "$cursorKey\Schemes" $state.expected.scheme $state.original.scheme
-    Undo-Values $runKey $state.expected.run $state.original.run
+    $previousRun = @($state.original.run | Where-Object { -not (Test-LegacyStartup $_.data) })
+    Undo-Values $runKey $state.expected.run $previousRun
     $references = @(Asset-References)
     $preserved = $false
     foreach ($file in $state.files) {
@@ -50,7 +51,6 @@ try {
         elseif ($exists) { Remove-Item -LiteralPath $file.path -Force }
     }
     Reload-Cursors
-    if ($state.original.helperRunning -and (Test-Path -LiteralPath $exe)) { Start-Helper | Out-Null }
     Remove-Item -LiteralPath $stateFile -Force
     if ($preserved) { Write-Warning "Original file backups remain in $($state.backupDir)" }
     else {
@@ -61,7 +61,7 @@ try {
             Remove-Item -LiteralPath $state.backupDir -Force
         }
     }
-    foreach ($directory in @($target, $installDir)) {
+    foreach ($directory in @($legacyDir, $installDir)) {
         if ((Test-Path -LiteralPath $directory) -and -not @(Get-ChildItem -LiteralPath $directory -Force).Count) {
             Remove-Item -LiteralPath $directory -Force
         }

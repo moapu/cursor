@@ -212,18 +212,13 @@ def forbidden(deg, flash=0.0):
     )
 
 
-def crocodile_hook():
-    """Crocodile's gold hook and ribbed cuff, with the shaft along the horizontal resize axis."""
-    hook = "M27 47V26C27 14 33 7 43 8C56 9 58 25 49 32C45 35 40 33 37 29L46 26C50 23 48 17 43 17C36 16 36 23 36 29V47Z"
-    shine = "M30 40V26Q30 11 42 11Q50 11 52 19"
-    body = (
-        f'<path d="{hook}" fill="url(#gold)" stroke-width="2.6"/>'
-        + clipped(hook, f'<path d="{shine}" fill="none" stroke="#fff4c5" stroke-width="2.2"/>')
-        + '<rect x="20" y="44" width="23" height="14" rx="3" fill="url(#gold)" stroke-width="2.6"/>'
-        + '<path d="M24 47V55M29 47V55M34 47V55M39 47V55" stroke="#a86c16" stroke-width="1.4"/>'
-        + '<path d="M22 46H41M22 56H41" stroke="#fff0b5" stroke-width="1.5"/>'
+def folded_ribbon():
+    """Gunko-inspired double-ended arrow ribbon, centred on the horizontal resize axis."""
+    ribbon = "M5 32L16 22V28H20L24 20H30L38 36H36L40 28H48V22L59 32L48 42V36H44L40 44H34L26 28H28L24 36H16V42Z"
+    return (
+        multi([(f'<path d="{ribbon}"/>', "url(#blackgl)")])
+        + f'<path d="{ribbon}" fill="none" stroke="{BONE}" stroke-width="1.2" stroke-linejoin="miter"/>'
     )
-    return rot(body, -90)
 
 
 # swords ---------------------------------------------------------------------------------------------------------------
