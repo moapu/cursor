@@ -1,59 +1,51 @@
-# One Piece cursors
+# Cursor themes
 
-One Piece cursor theme for Linux (XCursor) and Windows (`.cur` / `.ani`), generated from one script.
+- **[Kinetik JARVIS](Kinetik-JARVIS/README.md)** — cyan / graphite / gold Kinetik Aqua recolor for Linux, NixOS and Windows.
+- **One Piece** — illustrated Linux and Windows cursors; instructions below.
 
-![preview](src/preview.png)
+## One Piece
 
-| Cursor | Look |
+![Preview](src/preview.png)
+
+| Cursor | Artwork |
 | --- | --- |
-| Normal | Mihawk's Yoru, a shine runs down the blade |
-| Working | Yoru coated in Haki |
-| Busy | Gear 5 Luffy orbiting in a Haki ring |
+| Normal | Yoru with an animated shine |
+| Working | Haki-coated Yoru |
+| Busy | Gear 5 Luffy in a Haki ring |
 | Link | Chibi Luffy pointing |
 | Text | Meat on the bone |
-| Grab / grabbing | Gear 3 giant hand |
-| Not allowed | Jolly Roger shaking "no" |
-| Resize | Gunko-inspired charcoal folded ribbons, double-ended and rotated to match the resize axis |
+| Grab / grabbing | Gear 3 hand |
+| Unavailable | Shaking Jolly Roger |
+| Resize | Static, double-ended charcoal ribbons |
 | Move | Compass |
 | Precision | Sogeking's scope |
 
-## Linux
+### Linux
 
 ```sh
+mkdir -p ~/.icons
 ln -s "$PWD/OnePiece" ~/.icons/OnePiece
 ```
 
-Then set the theme to `OnePiece`, e.g. `XCURSOR_THEME=OnePiece` / `hyprctl setcursor OnePiece 24`.
-On Linux the pointer, text, resize and grab cursors are drawn 1.5x and the link cursor 2x the nominal size.
+Select `OnePiece` in cursor settings or set `XCURSOR_THEME=OnePiece`. Pointer, text, resize and grab cursors render at 1.5× nominal size; link renders at 2×.
 
-## Windows
+### Windows
 
-Windows uses native `.cur` / `.ani` files. No background process, PowerShell scripts or ZIP required.
+1. Right-click `OnePiece-Windows/install.inf` → **Install** (**Show more options** if needed); approve the prompt.
+2. **Mouse Properties → Pointers → One Piece → Apply**.
 
-1. In your checkout, open **`OnePiece-Windows`**, right-click **`install.inf`** → **Install**
-   (under **Show more options** if needed).
-2. Approve the administrator prompt.
-3. Open **Mouse Properties → Pointers**, select **One Piece**, and click **Apply**.
+Native `.cur` / `.ani` files install to `%WINDIR%\Cursors\OnePiece`; no helper is needed. Reinstall to update; select another scheme to switch back. The installer does not back up your selection.
 
-Files install into `%WINDIR%\Cursors\OnePiece`. To update, install the INF again. To switch away, select another
-cursor scheme in Mouse Properties; the installer does not back up your previous selection.
+If you installed the old directional helper, exit it and disable **OnePieceDirectionalResize** in **Windows Settings → Apps → Startup**; the installer does not stop it.
 
-If you previously installed the directional helper, exit it from its tray menu and disable
-**OnePieceDirectionalResize** in **Windows Settings → Apps → Startup** once. The INF does not stop an old helper.
+Four resize ribbons cover horizontal, vertical and diagonal axes, with shared cursors on opposite edges and Yoru's shading, outline and shadow.
 
-### Resize cursors
+### Build
 
-Four static, double-ended ribbons cover horizontal, vertical and both diagonal resize axes. Opposite edges share a
-cursor, as Windows normally expects. The ribbons use the same charcoal shading, dark outline and soft shadow as
-Yoru, with a pale ribbon edge for contrast. No per-edge cursor switching or helper is needed.
-
-## Build
-
-Needs `xcursorgen`, `rsvg-convert` (librsvg) and Python with Pillow. With Nix:
+Requires `xcursorgen`, `rsvg-convert` and Python/Pillow. With Nix:
 
 ```sh
 nix shell --impure --expr 'with builtins.getFlake "nixpkgs"; with legacyPackages.${builtins.currentSystem}; [ xcursorgen librsvg (python3.withPackages (p: [ p.pillow ])) ]' -c python3 src/build.py
 ```
 
-This regenerates `OnePiece/`, `OnePiece-Windows/` (including `install.inf`) and `src/preview.png`.
-The generated themes are ready to install; Python and the build tools are not needed for installation.
+Regenerates `OnePiece/`, `OnePiece-Windows/` and `src/preview.png`. Installation needs no build tools.

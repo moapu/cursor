@@ -1,0 +1,33 @@
+[Version]
+signature="$CHICAGO$"
+
+[DefaultInstall]
+CopyFiles = Scheme.Cur
+AddReg = Scheme.Reg
+
+[DestinationDirs]
+Scheme.Cur = 10,"%CUR_DIR%"
+
+[Scheme.Reg]
+HKCU,"Control Panel\Cursors\Schemes","%SCHEME_NAME%",0x00020000,"%10%\%CUR_DIR%\Normal.ani,%10%\%CUR_DIR%\Help.ani,%10%\%CUR_DIR%\WIB.ani,%10%\%CUR_DIR%\Busy.ani,%10%\%CUR_DIR%\Acc.ani,%10%\%CUR_DIR%\Text.ani,%10%\%CUR_DIR%\Lapiz.ani,%10%\%CUR_DIR%\Una.ani,%10%\%CUR_DIR%\VR.ani,%10%\%CUR_DIR%\HR.ani,%10%\%CUR_DIR%\DR 1.ani,%10%\%CUR_DIR%\DR 2.ani,%10%\%CUR_DIR%\Move.ani,%10%\%CUR_DIR%\Alt.ani,%10%\%CUR_DIR%\Boton.ani"
+
+[Scheme.Cur]
+"Normal.ani"
+"Help.ani"
+"WIB.ani"
+"Busy.ani"
+"Acc.ani"
+"Text.ani"
+"Lapiz.ani"
+"Una.ani"
+"VR.ani"
+"HR.ani"
+"DR 1.ani"
+"DR 2.ani"
+"Move.ani"
+"Alt.ani"
+"Boton.ani"
+
+[Strings]
+CUR_DIR = "Cursors\Kinetik-JARVIS"
+SCHEME_NAME = "Kinetik JARVIS"
