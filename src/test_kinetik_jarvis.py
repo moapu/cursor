@@ -7,7 +7,8 @@ import unittest
 from pathlib import Path
 
 from kinetik_jarvis.ani import animation, chunks, frames, premultiplied, verify
-from kinetik_jarvis.theme import CURSORS, CYAN, installer, linux, metal, recolor
+from kinetik_jarvis.theme import CURSORS, CYAN, THEME, linux, metal, recolor
+from theme import installer
 from kinetik_jarvis.xcursor import IMAGE_TYPE, SIZES, resize, weights, xcursor
 
 SOURCE = Path(os.environ.get(
@@ -50,7 +51,7 @@ def images(data):
 
 class UnitTests(unittest.TestCase):
     def test_catalog_is_unique(self):
-        names = [name for cursor in CURSORS for name in cursor.names.split()]
+        names = [name for cursor in CURSORS for name in (cursor.name, *cursor.aliases)]
         self.assertEqual(len(names), len(set(names)))
         self.assertEqual(len({cursor.role for cursor in CURSORS}), 15)
         self.assertEqual(len({cursor.file for cursor in CURSORS}), 15)
@@ -189,7 +190,7 @@ class OriginalTests(unittest.TestCase):
             verify(original, output)
 
     def test_installer_references_existing_files(self):
-        inf = installer().decode("ascii")
+        inf = installer(THEME).decode("ascii")
         self.assertIn('SCHEME_NAME = "Kinetik JARVIS"', inf)
         copied = inf.split("[Scheme.Cur]\r\n")[1].split("\r\n\r\n")[0].splitlines()
         self.assertEqual([name.strip('"') for name in copied], [cursor.file for cursor in CURSORS])

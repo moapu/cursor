@@ -1,18 +1,18 @@
-"""Rendering and the two output formats: XCursor (Linux) and .cur/.ani + install.inf (Windows)."""
+"""SVG rendering and XCursor / CUR / ANI encoding for One Piece artwork."""
 
 import io
 import struct
 import subprocess
 from functools import cache
 
-from PIL import Image
-
-from svg import svg
+from .svg import svg
 
 
 @cache
 def render(body, px, view=64, zoom=1):
     """Body rendered to a px-square RGBA image. Cached: Linux, Windows and the preview share many renders."""
+    from PIL import Image
+
     png = subprocess.run(["rsvg-convert", "-w", str(px), "-h", str(px)], input=svg(body, view, zoom).encode(),
                          capture_output=True, check=True).stdout
     return Image.open(io.BytesIO(png)).convert("RGBA")
@@ -26,20 +26,19 @@ def hotspot(hot, px, view):
 
 
 def xcursor(c, sizes, tmp, out):
-    """Write cursor `c` (all frames, all sizes) to out/<name> with xcursorgen, plus its alias symlinks."""
+    """Encode all SVG frames and sizes with xcursorgen; packaging owns the aliases."""
+    name = c.cursor.name
     multi = len(c.frames) > 1
     lines = []
     for i, (body, ms) in enumerate(c.frames):
         for size in sizes:
             px = round(size * c.grid * c.zoom / 64)
-            png = tmp / f"{c.name}-{i}-{size}.png"
+            png = tmp / f"{name}-{i}-{size}.png"
             render(body, px, c.grid, c.zoom).save(png)
             lines.append(f"{size} {' '.join(map(str, hotspot(c.hot, px, c.grid)))} {png}" + (f" {ms}" if multi else ""))
-    conf = tmp / f"{c.name}.conf"
+    conf = tmp / f"{name}.conf"
     conf.write_text("\n".join(lines) + "\n")
-    subprocess.run(["xcursorgen", str(conf), str(out / c.name)], check=True)
-    for alias in c.aliases.split():
-        (out / alias).symlink_to(c.name)
+    subprocess.run(["xcursorgen", str(conf), str(out / name)], check=True)
 
 
 # Windows --------------------------------------------------------------------------------------------------------------
@@ -47,6 +46,8 @@ def xcursor(c, sizes, tmp, out):
 
 def dib(img):
     """32-bit BMP (DIB) with an AND mask, as stored inside .cur files."""
+    from PIL import Image
+
     size = img.width
     flip = img.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     pixels = flip.tobytes("raw", "BGRA")
@@ -81,30 +82,8 @@ def ani(frames, hot, view, sizes):
     return b"RIFF" + struct.pack("<I", len(body)) + body
 
 
-def windows(c, sizes, out):
-    """Write cursor `c` as <win>.cur or <win>.ani; returns the file name."""
+def windows(c, sizes):
+    """Encode a drawing as CUR or ANI bytes; shared packaging writes the file."""
     if len(c.frames) == 1:
-        name, data = f"{c.win}.cur", cur(c.frames[0][0], c.hot, c.grid, sizes)
-    else:
-        name, data = f"{c.win}.ani", ani(c.frames, c.hot, c.grid, sizes)
-    (out / name).write_bytes(data)
-    return name
-
-
-def inf(roles, files, out, folder, title):
-    """install.inf: copies the files to %WINDIR%\\Cursors\\<folder> and registers them as the `title` scheme."""
-    path = lambda role: rf"%10%\%CUR_DIR%\{files[role]}"
-    lines = [
-        "[Version]", 'signature="$CHICAGO$"', "",
-        "[DefaultInstall]", "CopyFiles = Scheme.Cur", "AddReg    = Scheme.Reg, Wreg", "",
-        "[DestinationDirs]", 'Scheme.Cur = 10,"%CUR_DIR%"', "",
-        "[Scheme.Reg]",
-        rf'HKCU,"Control Panel\Cursors\Schemes","%SCHEME_NAME%",0x00020000,"{",".join(path(r) for r in roles)}"',
-        "",
-        "[Wreg]", r'HKCU,"Control Panel\Cursors",,0x00020000,"%SCHEME_NAME%"',
-        *(rf'HKCU,"Control Panel\Cursors",{r},0x00020000,"{path(r)}"' for r in roles),
-        "",
-        "[Scheme.Cur]", *(files[r] for r in roles), "",
-        "[Strings]", rf'CUR_DIR     = "Cursors\{folder}"', f'SCHEME_NAME = "{title}"', "",
-    ]
-    (out / "install.inf").write_bytes("\r\n".join(lines).encode())
+        return cur(c.frames[0][0], c.hot, c.grid, sizes)
+    return ani(c.frames, c.hot, c.grid, sizes)

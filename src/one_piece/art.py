@@ -3,7 +3,7 @@
 import math
 import random
 
-from svg import (BAND, BONE, HAT, NAVY, OUT, RED, SKIN, SKIN_LIT, SKIN_SH, WHITE, bolt, cel, clipped, multi,
+from .svg import (BAND, BONE, HAT, NAVY, OUT, RED, SKIN, SKIN_LIT, SKIN_SH, WHITE, bolt, cel, clipped, multi,
                  outlined, place, pulse, puffs, raw, ring, rot, tf_point, tfs)
 
 # small pieces ---------------------------------------------------------------------------------------------------------

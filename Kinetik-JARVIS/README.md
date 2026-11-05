@@ -68,6 +68,6 @@ KINETIK_SOURCE=/path/to/kinetik-aqua-x python3 -m unittest discover -s src -p 't
 
 One build exports both platforms; `--output <directory>` changes the destination. Unit tests are self-contained. Without `KINETIK_SOURCE`, integration tests use the sibling Aqua directory or skip if absent; an explicit source must contain all 15 animations.
 
-`src/kinetik_jarvis/` separates ANI parsing, XCursor encoding, theme packaging and previews. Tests cover pixels, geometry, transparency, hotspots, timing, aliases, palette and installer references.
+`src/kinetik_jarvis/` separates ANI parsing/recoloring, XCursor encoding and previews. Both themes share the cursor catalog and Linux/Windows packaging in `src/theme.py`; command-line builders stay thin. Tests cover pixels, geometry, transparency, hotspots, timing, aliases, palette and installer references. See the repository [source layout and full test command](../README.md#source-layout--tests).
 
 Format verified with libXcursor 1.2.3; NixOS options checked against nixpkgs `1d060086d60cb76a40cf37109f979d88a5bd6396`.
