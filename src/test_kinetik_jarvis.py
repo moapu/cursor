@@ -9,7 +9,7 @@ from pathlib import Path
 from kinetik_jarvis.ani import animation, chunks, frames, premultiplied, verify
 from kinetik_jarvis.theme import CURSORS, CYAN, THEME, linux, metal, recolor
 from theme import installer
-from kinetik_jarvis.xcursor import IMAGE_TYPE, SIZES, resize, weights, xcursor
+from kinetik_jarvis.xcursor import IMAGE_TYPE, SIZES, ZOOM, resize, weights, xcursor
 
 SOURCE = Path(os.environ.get(
     "KINETIK_SOURCE", str(Path(__file__).resolve().parents[2] / "work-configs/cursor/kinetik-aqua-x")
@@ -78,6 +78,11 @@ class UnitTests(unittest.TestCase):
         original = sample(sequence=(0, 0), rate=6)
         self.assertEqual(animation(original), [(frames(original)[0], 100)] * 2)
         self.assertEqual(len(list(images(xcursor(original, sizes=(2,))))), 2)
+
+    def test_linux_zoom_keeps_nominal_size(self):
+        (_, size, header, pixels), = images(xcursor(sample(), sizes=(24,), zoom=1.5))
+        self.assertEqual((size, header[2], header[4:8]), (24, 24, (36, 36, 18, 18)))
+        self.assertEqual(len(pixels), 36 * 36 * 4)
 
     def test_invalid_animation_order_and_rate(self):
         for original in (sample(sequence=(1,)), sample(rate=0)):
@@ -203,7 +208,7 @@ class OriginalTests(unittest.TestCase):
         for name, source in self.cursors.items():
             with self.subTest(cursor=name):
                 sequence = animation(source)
-                data = xcursor(source, sizes=(64,))
+                data = xcursor(source, sizes=(64,), zoom=1)
                 self.assertEqual(struct.unpack_from("<4I", data), (0x72756358, 16, 0x10000, len(sequence)))
                 for (frame, delay), (kind, size, header, pixels) in zip(sequence, images(data)):
                     self.assertEqual((kind, size), (IMAGE_TYPE, 64))
@@ -217,7 +222,7 @@ class OriginalTests(unittest.TestCase):
         seen = set()
         for kind, size, header, pixels in images(data):
             length, _, _, version, w, h, hx, hy, delay = header
-            self.assertEqual((kind, length, version, w, h), (IMAGE_TYPE, 36, 1, size, size))
+            self.assertEqual((kind, length, version, w, h), (IMAGE_TYPE, 36, 1, *(round(size * ZOOM),) * 2))
             self.assertTrue(0 <= hx < w and 0 <= hy < h and delay > 0)
             seen.add(size)
             self.assertEqual(len(pixels), w * h * 4)

@@ -7,6 +7,7 @@ from functools import cache
 from .ani import animation, premultiplied
 
 SIZES = (24, 32, 48, 64, 96)
+ZOOM = 1.5  # drawn bigger than the nominal size, like OnePiece's pointer
 IMAGE_TYPE = 0xFFFD0002
 
 
@@ -48,7 +49,7 @@ def resize(pixels, width, height, size):
     return bytes(output)
 
 
-def xcursor(data, sizes=SIZES):
+def xcursor(data, sizes=SIZES, zoom=ZOOM):
     """XCursor 1.0 format, checked against libXcursor 1.2.3's Xcursor.h."""
     sequence = animation(data)
     table, body = bytearray(), bytearray()
@@ -56,11 +57,12 @@ def xcursor(data, sizes=SIZES):
     position = 16 + entries * 12
     pixels = {frame: premultiplied(data, frame) for frame in dict(sequence)}
     for size in sizes:
+        px = round(size * zoom)
         for frame, delay in sequence:
-            xhot = min(size - 1, round(frame.xhot * size / frame.width))
-            yhot = min(size - 1, round(frame.yhot * size / frame.height))
-            image = struct.pack("<9I", 36, IMAGE_TYPE, size, 1, size, size, xhot, yhot, delay)
-            image += resize(pixels[frame], frame.width, frame.height, size)
+            xhot = min(px - 1, round(frame.xhot * px / frame.width))
+            yhot = min(px - 1, round(frame.yhot * px / frame.height))
+            image = struct.pack("<9I", 36, IMAGE_TYPE, size, 1, px, px, xhot, yhot, delay)
+            image += resize(pixels[frame], frame.width, frame.height, px)
             table.extend(struct.pack("<3I", IMAGE_TYPE, size, position))
             body.extend(image)
             position += len(image)
