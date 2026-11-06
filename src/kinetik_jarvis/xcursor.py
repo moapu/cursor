@@ -32,20 +32,22 @@ def weights(source, target):
     return tuple(result)
 
 
+def blend(vectors, samples):
+    """Weighted sums of whole vectors; sum() keeps a per-pixel loop's float result."""
+    return [list(map(sum, zip(*([value * weight for value in vectors[index]] for index, weight in taps))))
+            for taps in samples]
+
+
 def resize(pixels, width, height, size):
+    """Separable resampling, one channel plane at a time (columns, then rows)."""
     if (width, height) == (size, size):
         return pixels
-    horizontal = []
     xweights, yweights = weights(width, size), weights(height, size)
-    for y in range(height):
-        for samples in xweights:
-            horizontal.append(tuple(sum(pixels[(y * width + x) * 4 + channel] * weight
-                                        for x, weight in samples) for channel in range(4)))
-    output = bytearray()
-    for samples in yweights:
-        for x in range(size):
-            output.extend(round(sum(horizontal[y * size + x][channel] * weight for y, weight in samples))
-                          for channel in range(4))
+    stride, output = width * 4, bytearray(size * size * 4)
+    for channel in range(4):
+        columns = list(zip(*(pixels[y * stride + channel:(y + 1) * stride:4] for y in range(height))))
+        rows = list(zip(*blend(columns, xweights)))
+        output[channel::4] = bytes(round(value) for row in blend(rows, yweights) for value in row)
     return bytes(output)
 
 
@@ -58,11 +60,12 @@ def xcursor(data, sizes=SIZES, zoom=ZOOM):
     pixels = {frame: premultiplied(data, frame) for frame in dict(sequence)}
     for size in sizes:
         px = round(size * zoom)
+        scaled = {frame: resize(image, frame.width, frame.height, px) for frame, image in pixels.items()}
         for frame, delay in sequence:
             xhot = min(px - 1, round(frame.xhot * px / frame.width))
             yhot = min(px - 1, round(frame.yhot * px / frame.height))
             image = struct.pack("<9I", 36, IMAGE_TYPE, size, 1, px, px, xhot, yhot, delay)
-            image += resize(pixels[frame], frame.width, frame.height, px)
+            image += scaled[frame]
             table.extend(struct.pack("<3I", IMAGE_TYPE, size, position))
             body.extend(image)
             position += len(image)
