@@ -1,7 +1,7 @@
 # Cursor themes
 
 - **[Kinetik JARVIS](Kinetik-JARVIS/README.md)** — cyan / graphite / gold Kinetik Aqua recolor for Linux, NixOS and Windows.
-- **One Piece** — illustrated Linux and Windows cursors; instructions below.
+- **One Piece** — illustrated Linux and Windows cursors; below.
 
 ## One Piece
 
@@ -27,44 +27,40 @@ mkdir -p ~/.icons
 ln -s "$PWD/OnePiece" ~/.icons/OnePiece
 ```
 
-Select `OnePiece` in cursor settings or set `XCURSOR_THEME=OnePiece`. Pointer, text, resize and grab cursors render at 1.5× nominal size; link renders at 2×.
+Select `OnePiece` in cursor settings or set `XCURSOR_THEME=OnePiece`. Pointer, text, resize and grab cursors render at 1.5× nominal size; link at 2×.
 
 ### Windows
 
 1. Right-click `OnePiece/install.inf` → **Install** (**Show more options** if needed); approve the prompt.
 2. **Mouse Properties → Pointers → One Piece → Apply**.
 
-Native `.cur` / `.ani` files install to `%WINDIR%\Cursors\OnePiece`; no helper is needed. Reinstall to update; select another scheme to switch back. The installer does not back up your selection.
+Installs `.cur` / `.ani` files to `%WINDIR%\Cursors\OnePiece`; no helper needed. Reinstall to update; select another scheme to switch back. The installer doesn't back up your selection.
 
-If you installed the old directional helper, exit it and disable **OnePieceDirectionalResize** in **Windows Settings → Apps → Startup**; the installer does not stop it.
-
-Four resize ribbons cover horizontal, vertical and diagonal axes, with shared cursors on opposite edges and Yoru's shading, outline and shadow.
+Old directional helper installed? Exit it and disable **OnePieceDirectionalResize** in **Settings → Apps → Startup**; the installer doesn't stop it.
 
 ### Build
 
-Requires `xcursorgen`, `rsvg-convert` and Python/Pillow. With Nix:
+Requires `xcursorgen`, `rsvg-convert` and Python/Pillow:
 
 ```sh
 nix shell --impure --expr 'with builtins.getFlake "nixpkgs"; with legacyPackages.${builtins.currentSystem}; [ xcursorgen librsvg (python3.withPackages (p: [ p.pillow ])) ]' -c python3 src/build.py
 ```
 
-Regenerates `OnePiece/`: Linux files in `cursors/`, Windows `.cur` / `.ani` files and `install.inf` at the root, plus `preview.png`. This matches `Kinetik-JARVIS/`'s single-folder layout. Installation needs no build tools. Use `--output <directory>` to change the destination; builds preserve unrelated files.
+Regenerates `OnePiece/` (Linux `cursors/`, Windows files, `install.inf`, `preview.png`) and keeps unrelated files. `--output <directory>` changes the destination.
 
-## Source layout / tests
+## Source / tests
 
-Both themes use the same cursor catalog and platform packaging:
+- `src/theme.py` — shared catalog, Linux aliases/theme files, Windows installers.
+- `src/one_piece/` — SVG art, CUR/ANI/XCursor encoding, preview, build.
+- `src/kinetik_jarvis/` — ANI recoloring, XCursor encoding, preview, build.
+- `src/build.py`, `src/build_kinetik_jarvis.py` — command-line entry points.
 
-- `src/theme.py` — shared cursor/Windows-role metadata, Linux aliases and theme files, Windows installers.
-- `src/one_piece/` — SVG artwork, CUR/ANI/XCursor encoding, preview and build pipeline.
-- `src/kinetik_jarvis/` — ANI recoloring, XCursor encoding, preview and build pipeline.
-- `src/build.py` / `src/build_kinetik_jarvis.py` — thin command-line entry points; existing commands still work.
+One Piece's installer activates its scheme; Kinetik's only registers it.
 
-Rendering stays theme-specific; packaging follows one pattern. One Piece's installer still activates its scheme; Kinetik's still only registers it.
-
-Run all catalog, packaging and encoder tests with Python 3.10+ (no rendering tools needed):
+Tests need Python 3.10+, no rendering tools:
 
 ```sh
 python3 -m unittest discover -s src -p 'test_*.py' -v
 ```
 
-Kinetik integration tests use the original Aqua files; see its [rebuild instructions](Kinetik-JARVIS/README.md#rebuild--test).
+Kinetik integration tests need the original Aqua files; see [rebuild](Kinetik-JARVIS/README.md#rebuild--test).
